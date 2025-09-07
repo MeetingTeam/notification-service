@@ -23,13 +23,17 @@ public class MailServiceImpl implements MailService {
 
     @Value("${spring.mail.custom.sender-name}")
     private String senderName;
+    @Value("${mail.activated}")
+    private boolean mailActivated;
 
     @Override
     public void sendMailToMultipleDests(MailDto mailDto){
         List<ResUserDto> userDtos = userService.getUsersByIds(mailDto.getRecipientIds());
         
         for(var userDto: userDtos){
-            sendFakeEmail(userDto.getEmail(), mailDto.getSubject(), mailDto.getContent());
+            if(mailActivated)
+                sendEmail(userDto.getEmail(), mailDto.getSubject(), mailDto.getContent());
+            else sendFakeEmail(userDto.getEmail(), mailDto.getSubject(), mailDto.getContent());
         }
     }
 
