@@ -1,5 +1,9 @@
 FROM openjdk:17-jdk-alpine
 
+# Install stress-ng (requires root)
+USER root
+RUN apk add --no-cache stress-ng iproute2
+
 # Change directory
 WORKDIR /app
 
@@ -8,16 +12,21 @@ ARG OTEL_AGENT_VERSION=2.8.0
 ARG OTEL_AGENT_JAR=/app/opentelemetry-javaagent.jar
 ADD https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v${OTEL_AGENT_VERSION}/opentelemetry-javaagent.jar $OTEL_AGENT_JAR
 
-# Copy war file
+# Copy war file and start-app.sh script
 COPY target/notification-service-0.0.1-SNAPSHOT.war notification-service.war
+COPY start-app.sh /app/start-app.sh
+RUN chmod +x /app/start-app.sh
 
-# Create non-root user
-RUN adduser -D notification_service
-RUN chown -R notification_service:notification_service /app
-USER notification_service
+# Environment variables
+ENV ENABLE_STRESS_NG=false
+ENV STRESS_ARGS="--cpu 1"
+
+ENV ENABLE_TC=false
+ENV TC_LOSS_PERCENT=10
+ENV TC_DELAY_TIME=1000
 
 # Run app
-ENTRYPOINT ["sh","-c","java -javaagent:opentelemetry-javaagent.jar -jar -Dspring.config.location=${CONFIG_PATH} notification-service.war"]
+ENTRYPOINT ["/app/start-app.sh"]
 
 # Expose port 8086
 EXPOSE 8086

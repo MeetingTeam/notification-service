@@ -38,15 +38,7 @@ public class MailServiceImpl implements MailService {
     }
 
     public void sendFakeEmail(String to, String subject, String content) {
-        try {
-            // delay 1 second
-            Thread.sleep(1000);
-
-            log.info("Send mail to {} successfully", to);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt(); // restore interrupted flag
-           log.error("Unable to send email to {}", to);
-        }
+        log.info("Send mail to {} successfully", to);
     }
     
     public void sendEmail(String to, String subject, String content) {

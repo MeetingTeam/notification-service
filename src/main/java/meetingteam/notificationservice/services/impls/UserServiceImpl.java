@@ -22,8 +22,6 @@ public class UserServiceImpl implements UserService{
     private final RestClient restClient;
     private final ServiceUrlConfig serviceUrlConfig;
 
-    @Retry(name="restApi")
-    @CircuitBreaker(name="restCircuitBreaker")
     public List<ResUserDto> getUsersByIds(List<String> userIds) {
         URI uri= UriComponentsBuilder.fromHttpUrl(serviceUrlConfig.userServiceUrl())
                 .path("/user/private/by-ids")
